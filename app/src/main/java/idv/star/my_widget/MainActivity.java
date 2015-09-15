@@ -1,18 +1,16 @@
 package idv.star.my_widget;
 
-import android.app.Activity;
-import android.app.admin.*;
+import android.app.admin.DevicePolicyManager;
 import android.bluetooth.BluetoothAdapter;
 import android.content.ComponentName;
 import android.content.Context;
+import android.content.Intent;
 import android.hardware.Camera;
 import android.hardware.Camera.Parameters;
 import android.net.wifi.WifiManager;
 import android.os.Bundle;
-import android.os.Vibrator;
 import android.provider.Settings;
 import android.support.v7.app.ActionBarActivity;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -29,7 +27,7 @@ public class MainActivity extends ActionBarActivity {
     BluetoothAdapter adapter = BluetoothAdapter.getDefaultAdapter();
     private final int REQUEST_CODE = 100;
     DevicePolicyManager devicePolicyManager;
-    static final String LOG_TAG = "DeviceAdminReceiver";
+
 
 
 
@@ -50,7 +48,6 @@ public class MainActivity extends ActionBarActivity {
         else {
             Toast.makeText(MainActivity.this, "此手機無Wifi", Toast.LENGTH_SHORT).show();
         }
-
 
 
 
@@ -114,7 +111,7 @@ public class MainActivity extends ActionBarActivity {
         ibLock.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                turnScreenOffAndExit();
+               onLock();
             }
         });
        ibRotation=(ImageButton)findViewById(R.id.ibRotation);
@@ -145,41 +142,40 @@ public class MainActivity extends ActionBarActivity {
 
 
     }
-    private void turnScreenOffAndExit() {
-        // first lock screen
-        turnScreenOff(getApplicationContext());
-
-        // then provide feedback
-        ((Vibrator) getSystemService(Context.VIBRATOR_SERVICE)).vibrate(50);
-
-        // schedule end of activity
-        final Activity activity = this;
-        Thread t = new Thread() {
-            public void run() {
-                try {
-                    sleep(500);
-                } catch (InterruptedException e) {
-					/* ignore this */
-                }
-                activity.finish();
-            }
-        };
-        t.start();
-    }
-    static void turnScreenOff(final Context context) {
-        DevicePolicyManager policyManager = (DevicePolicyManager) context
-                .getSystemService(Context.DEVICE_POLICY_SERVICE);
-        ComponentName adminReceiver = new ComponentName(context,
-                android.app.admin.DeviceAdminReceiver.class);
-        boolean admin = policyManager.isAdminActive(adminReceiver);
-        if (admin) {
-            Log.i(LOG_TAG, "Going to sleep now.");
-            policyManager.lockNow();
+    private void onLock(){
+        ComponentName componentName = new ComponentName(getApplicationContext(), DeviceAdminReceiver.class);
+        devicePolicyManager = (DevicePolicyManager) getSystemService(Context.DEVICE_POLICY_SERVICE);
+        boolean isAdminActive = devicePolicyManager.isAdminActive(componentName);
+        if (!isAdminActive) {
+            Intent intent = new Intent(DevicePolicyManager.ACTION_ADD_DEVICE_ADMIN);
+            intent.putExtra(DevicePolicyManager.EXTRA_DEVICE_ADMIN, componentName);
+            intent.putExtra(DevicePolicyManager.EXTRA_ADD_EXPLANATION, "若要解除安裝此程式，請至 設定 > 安全性 > 裝置管理員 內取消此 App 的勾選");
+            startActivityForResult(intent, REQUEST_CODE);
         } else {
-            Log.i(LOG_TAG, "Not an admin");
+            // 鎖屏
+            devicePolicyManager.lockNow();
+            finish();
+        }
 
+
+
+
+
+    }
+    @Override
+
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode,data);    //+
+        if (requestCode == REQUEST_CODE) {
+            if (resultCode == RESULT_OK) {
+                devicePolicyManager.lockNow();
+            }
+            finish();
         }
     }
+
+
+
 
     public void setAutoOrientationEnabled(Context context, boolean enabled)
     {
