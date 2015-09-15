@@ -23,11 +23,12 @@ public class MainActivity extends ActionBarActivity {
     private WifiManager wiFiManager;
     private Camera camera;
     private boolean isLighOn=false;
+    private ComponentName componentName;
     BluetoothAdapter adapter = BluetoothAdapter.getDefaultAdapter();
     private final int REQUEST_CODE = 100;
     DevicePolicyManager devicePolicyManager;
 
-    ComponentName componentName = new ComponentName(getApplicationContext(), DeviceAdminReceiver.class);
+
 
 
 
@@ -35,16 +36,20 @@ public class MainActivity extends ActionBarActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+       setContentView(R.layout.activity_main);
+
         camera = Camera.open();
+
+        //檢查有無Wifi
         wiFiManager = (WifiManager) this.getSystemService(Context.WIFI_SERVICE);
         if(adapter!=null){
 
         }
         else {
-            Toast.makeText(MainActivity.this, "此手機無藍芽", Toast.LENGTH_SHORT).show();
+            Toast.makeText(MainActivity.this, "此手機無Wifi", Toast.LENGTH_SHORT).show();
         }
         //鎖頻
+        ComponentName componentName = new ComponentName(getApplicationContext(), DeviceAdminReceiver.class);
                devicePolicyManager = (DevicePolicyManager) getSystemService(Context.DEVICE_POLICY_SERVICE);
 
 
@@ -58,10 +63,11 @@ public class MainActivity extends ActionBarActivity {
         ibBluetooth.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if(adapter.isEnabled()!=true){
+                if (adapter.isEnabled() != true) {   //檢查藍芽有無開啟.藍芽未開啟
+                    //開啟藍芽
                     adapter.enable();
-                }
-                else {
+                } else {
+                    //關閉藍芽
                     adapter.disable();
                 }
             }
@@ -115,7 +121,7 @@ public class MainActivity extends ActionBarActivity {
         ibRotation.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                setAutoOrientationEnabled(MainActivity.this,false);
+                setAutoOrientationEnabled(MainActivity.this, false);
 
             }
         });
@@ -127,17 +133,13 @@ public class MainActivity extends ActionBarActivity {
 
     }
 
-
-
-
-
     private void turnOnOffWifi(){
 
-        if (!wiFiManager.isWifiEnabled()) {
-            wiFiManager.setWifiEnabled(true);
+        if (!wiFiManager.isWifiEnabled()) {//Wifi未開啟則
+            wiFiManager.setWifiEnabled(true);//打開Wifi
         }
         else{
-            wiFiManager.setWifiEnabled(false);
+            wiFiManager.setWifiEnabled(false);//關閉Wifi
         }
 
 
@@ -157,6 +159,7 @@ public class MainActivity extends ActionBarActivity {
             finish();
         }
     }
+
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == REQUEST_CODE) {
             if (resultCode == RESULT_OK) {
