@@ -24,9 +24,9 @@ public class MainActivity extends ActionBarActivity {
     private Camera camera;
     private boolean isLighOn=false;
     private ComponentName componentName;
-    BluetoothAdapter adapter = BluetoothAdapter.getDefaultAdapter();
-    private final int REQUEST_CODE = 100;
-    DevicePolicyManager devicePolicyManager;
+    private BluetoothAdapter adapter = BluetoothAdapter.getDefaultAdapter();
+    private final int LOCK_SCREEN_CODE = 100;
+    private DevicePolicyManager manger;
 
 
 
@@ -36,7 +36,10 @@ public class MainActivity extends ActionBarActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-       setContentView(R.layout.activity_main);
+        setContentView(R.layout.activity_main);
+        manger=(DevicePolicyManager) getSystemService(Context.DEVICE_POLICY_SERVICE);
+        componentName=new ComponentName(this, deviceAdminReceiver.class);
+
 
         camera = Camera.open();
 
@@ -112,6 +115,7 @@ public class MainActivity extends ActionBarActivity {
             @Override
             public void onClick(View v) {
                onLock();
+
             }
         });
        ibRotation=(ImageButton)findViewById(R.id.ibRotation);
@@ -143,36 +147,38 @@ public class MainActivity extends ActionBarActivity {
 
     }
     private void onLock(){
-        ComponentName componentName = new ComponentName(getApplicationContext(), DeviceAdminReceiver.class);
-        devicePolicyManager = (DevicePolicyManager) getSystemService(Context.DEVICE_POLICY_SERVICE);
-        boolean isAdminActive = devicePolicyManager.isAdminActive(componentName);
-        if (!isAdminActive) {
-            Intent intent = new Intent(DevicePolicyManager.ACTION_ADD_DEVICE_ADMIN);
-            intent.putExtra(DevicePolicyManager.EXTRA_DEVICE_ADMIN, componentName);
-            intent.putExtra(DevicePolicyManager.EXTRA_ADD_EXPLANATION, "若要解除安裝此程式，請至 設定 > 安全性 > 裝置管理員 內取消此 App 的勾選");
-            startActivityForResult(intent, REQUEST_CODE);
-        } else {
-            // 鎖屏
-            devicePolicyManager.lockNow();
-            finish();
+        boolean active=manger.isAdminActive(componentName);
+        if(active){
+            manger.lockNow();
+
+        }
+        else{
+            Intent intent=new Intent(DevicePolicyManager.ACTION_ADD_DEVICE_ADMIN);
+            intent.putExtra(DevicePolicyManager.EXTRA_DEVICE_ADMIN,componentName);
+            startActivityForResult(intent, 0);
+            manger.lockNow();
+
+        }
+
+
         }
 
 
 
 
 
-    }
+
+
+
+
     @Override
-
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode,data);    //+
-        if (requestCode == REQUEST_CODE) {
-            if (resultCode == RESULT_OK) {
-                devicePolicyManager.lockNow();
-            }
-            finish();
-        }
+    public boolean onCreateOptionsMenu(Menu menu) {
+        // Inflate the menu; this adds items to the action bar if it is present.
+        getMenuInflater().inflate(R.menu.menu_main, menu);
+        return true;
     }
+
+
 
 
 
@@ -184,12 +190,7 @@ public class MainActivity extends ActionBarActivity {
 
 
 
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu_main, menu);
-        return true;
-    }
+
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
