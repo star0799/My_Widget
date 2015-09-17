@@ -17,7 +17,6 @@ import android.view.View;
 import android.widget.ImageButton;
 import android.widget.Toast;
 
-
 public class MainActivity extends ActionBarActivity {
     private ImageButton ibBluetooth,ibWifi,ibLED,ibLock,ibRotation;
     private WifiManager wiFiManager;
@@ -39,6 +38,7 @@ public class MainActivity extends ActionBarActivity {
         setContentView(R.layout.activity_main);
         manger=(DevicePolicyManager) getSystemService(Context.DEVICE_POLICY_SERVICE);
         componentName=new ComponentName(this, deviceAdminReceiver.class);
+
 
 
         camera = Camera.open();
@@ -118,13 +118,27 @@ public class MainActivity extends ActionBarActivity {
 
             }
         });
+
        ibRotation=(ImageButton)findViewById(R.id.ibRotation);
         ibRotation.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                setAutoOrientationEnabled(MainActivity.this, false);
+                if  (android.provider.Settings.System.getInt(getContentResolver(),Settings.System.ACCELEROMETER_ROTATION, 0) == 1){
+                    android.provider.Settings.System.putInt(getContentResolver(),Settings.System.ACCELEROMETER_ROTATION, 0);
+
+                }
+                else{
+                    android.provider.Settings.System.putInt(getContentResolver(), Settings.System.ACCELEROMETER_ROTATION, 1);
+
+                }
+
+
+
+
 
             }
+
+
         });
 
 
@@ -154,7 +168,7 @@ public class MainActivity extends ActionBarActivity {
         }
         else{
             Intent intent=new Intent(DevicePolicyManager.ACTION_ADD_DEVICE_ADMIN);
-            intent.putExtra(DevicePolicyManager.EXTRA_DEVICE_ADMIN,componentName);
+            intent.putExtra(DevicePolicyManager.EXTRA_DEVICE_ADMIN, componentName);
             startActivityForResult(intent, 0);
             manger.lockNow();
 
@@ -162,6 +176,12 @@ public class MainActivity extends ActionBarActivity {
 
 
         }
+
+
+
+
+
+
 
 
 
@@ -183,10 +203,6 @@ public class MainActivity extends ActionBarActivity {
 
 
 
-    public void setAutoOrientationEnabled(Context context, boolean enabled)
-    {
-        Settings.System.putInt(context.getContentResolver(), Settings.System.ACCELEROMETER_ROTATION, enabled ? 1 : 0);
-    }
 
 
 
