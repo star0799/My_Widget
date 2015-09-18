@@ -7,6 +7,8 @@ import android.content.Context;
 import android.content.Intent;
 import android.hardware.Camera;
 import android.hardware.Camera.Parameters;
+import android.location.LocationManager;
+import android.net.Uri;
 import android.net.wifi.WifiManager;
 import android.os.Bundle;
 import android.provider.Settings;
@@ -18,7 +20,7 @@ import android.widget.ImageButton;
 import android.widget.Toast;
 
 public class MainActivity extends ActionBarActivity {
-    private ImageButton ibBluetooth,ibWifi,ibLED,ibLock,ibRotation;
+    private ImageButton ibBluetooth,ibWifi,ibLED,ibLock,ibRotation,ibGPS;
     private WifiManager wiFiManager;
     private Camera camera;
     private boolean isLighOn=false;
@@ -26,7 +28,7 @@ public class MainActivity extends ActionBarActivity {
     private BluetoothAdapter adapter = BluetoothAdapter.getDefaultAdapter();
     private final int LOCK_SCREEN_CODE = 100;
     private DevicePolicyManager manger;
-
+    private LocationManager locationManager;
 
 
 
@@ -38,7 +40,7 @@ public class MainActivity extends ActionBarActivity {
         setContentView(R.layout.activity_main);
         manger=(DevicePolicyManager) getSystemService(Context.DEVICE_POLICY_SERVICE);
         componentName=new ComponentName(this, deviceAdminReceiver.class);
-
+        locationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
 
 
         camera = Camera.open();
@@ -140,6 +142,31 @@ public class MainActivity extends ActionBarActivity {
 
 
         });
+        ibGPS=(ImageButton)findViewById(R.id.ibGPS);
+        ibGPS.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                String provider = Settings.Secure.getString(getContentResolver(), Settings.Secure.LOCATION_PROVIDERS_ALLOWED);
+
+                if(!provider.contains("gps")){ //if gps is disabled
+                    final Intent poke = new Intent();
+                    poke.setClassName("com.android.settings", "com.android.settings.widget.SettingsAppWidgetProvider");
+                    poke.addCategory(Intent.CATEGORY_ALTERNATIVE);
+                    poke.setData(Uri.parse("3"));
+                    sendBroadcast(poke);
+                }
+                else {
+
+                        final Intent poke = new Intent();
+                        poke.setClassName("com.android.settings", "com.android.settings.widget.SettingsAppWidgetProvider");
+                        poke.addCategory(Intent.CATEGORY_ALTERNATIVE);
+                        poke.setData(Uri.parse("3"));
+                        sendBroadcast(poke);
+                }
+
+            }
+        });
+
 
 
 
@@ -176,6 +203,7 @@ public class MainActivity extends ActionBarActivity {
 
 
         }
+
 
 
 
