@@ -16,19 +16,17 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:id="@+id/ibRotation"
-        android:layout_alignTop="@+id/ibShock"
-        android:layout_alignRight="@+id/ibBluetooth"
-        android:layout_alignEnd="@+id/ibBluetooth" />
+        android:layout_alignTop="@+id/ibWifi"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true" />
 
     <ImageButton
 android:src="@drawable/b"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:id="@+id/ibBluetooth"
-        android:layout_marginTop="58dp"
-        android:layout_below="@+id/ibWifi"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true" />
+        android:layout_centerVertical="true"
+        android:layout_centerHorizontal="true" />
 
     <ImageButton
         android:src="@drawable/g"
@@ -36,11 +34,9 @@ android:src="@drawable/b"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:id="@+id/ibGPS"
-        android:layout_alignTop="@+id/ibLED"
-        android:layout_toLeftOf="@+id/imageView4"
-        android:layout_toStartOf="@+id/imageView4"
-        android:layout_marginRight="57dp"
-        android:layout_marginEnd="57dp" />
+        android:layout_alignParentTop="true"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true" />
 
     <ImageButton
         android:src="@drawable/l"
@@ -48,9 +44,9 @@ android:src="@drawable/b"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:id="@+id/ibLock"
-        android:layout_alignTop="@+id/imageView4"
-        android:layout_alignParentRight="true"
-        android:layout_alignParentEnd="true" />
+        android:layout_alignTop="@+id/imageView2"
+        android:layout_alignLeft="@+id/ibShock"
+        android:layout_alignStart="@+id/ibShock" />
 
     <ImageButton
 android:src="@drawable/f"
@@ -58,20 +54,17 @@ android:src="@drawable/f"
         android:layout_height="wrap_content"
         android:id="@+id/imageView2"
         android:layout_above="@+id/ibBluetooth"
-        android:layout_alignParentRight="true"
-        android:layout_alignParentEnd="true" />
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true" />
 
     <ImageButton
         android:src="@drawable/h"
 
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:id="@+id/imageView4"
-        android:layout_marginRight="60dp"
-        android:layout_marginEnd="60dp"
-        android:layout_alignTop="@+id/imageView3"
-        android:layout_toLeftOf="@+id/ibLock"
-        android:layout_toStartOf="@+id/ibLock" />
+        android:id="@+id/ibHotspot"
+        android:layout_alignParentTop="true"
+        android:layout_centerHorizontal="true" />
 
     <ImageButton
         android:src="@drawable/la"
@@ -80,10 +73,9 @@ android:src="@drawable/f"
         android:layout_height="wrap_content"
         android:id="@+id/ibLED"
         android:layout_gravity="center_vertical"
-        android:layout_marginBottom="89dp"
-        android:layout_above="@+id/ibWifi"
-        android:layout_alignRight="@+id/ibWifi"
-        android:layout_alignEnd="@+id/ibWifi" />
+        android:layout_alignParentTop="true"
+        android:layout_alignLeft="@+id/ibShock"
+        android:layout_alignStart="@+id/ibShock" />
 
     <ImageButton
         android:src="@drawable/s"
@@ -91,9 +83,9 @@ android:src="@drawable/f"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:id="@+id/ibShock"
-        android:layout_centerVertical="true"
-        android:layout_alignLeft="@+id/imageView3"
-        android:layout_alignStart="@+id/imageView3" />
+        android:layout_alignTop="@+id/ibWifi"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true" />
 
     <ImageButton
         android:src="@drawable/w"
@@ -101,9 +93,9 @@ android:src="@drawable/f"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:id="@+id/ibWifi"
-        android:layout_alignTop="@+id/ibShock"
-        android:layout_alignLeft="@+id/imageView4"
-        android:layout_alignStart="@+id/imageView4" />
+        android:layout_above="@+id/ibLock"
+        android:layout_centerHorizontal="true"
+        android:layout_marginBottom="54dp" />
 
 
 

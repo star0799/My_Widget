@@ -9,6 +9,7 @@ import android.hardware.Camera;
 import android.hardware.Camera.Parameters;
 import android.location.LocationManager;
 import android.net.Uri;
+import android.net.wifi.WifiConfiguration;
 import android.net.wifi.WifiManager;
 import android.os.Bundle;
 import android.provider.Settings;
@@ -19,8 +20,10 @@ import android.view.View;
 import android.widget.ImageButton;
 import android.widget.Toast;
 
+import java.lang.reflect.Method;
+
 public class MainActivity extends ActionBarActivity {
-    private ImageButton ibBluetooth,ibWifi,ibLED,ibLock,ibRotation,ibGPS;
+    private ImageButton ibBluetooth,ibWifi,ibLED,ibLock,ibRotation,ibGPS,ibHotspot;
     private WifiManager wiFiManager;
     private Camera camera;
     private boolean isLighOn=false;
@@ -46,13 +49,15 @@ public class MainActivity extends ActionBarActivity {
         camera = Camera.open();
 
         //檢查有無Wifi
-        wiFiManager = (WifiManager) this.getSystemService(Context.WIFI_SERVICE);
+        wiFiManager = (WifiManager) this.getSystemService(MainActivity.this.WIFI_SERVICE);
         if(adapter!=null){
 
         }
         else {
             Toast.makeText(MainActivity.this, "此手機無Wifi", Toast.LENGTH_SHORT).show();
         }
+
+
 
 
 
@@ -148,24 +153,39 @@ public class MainActivity extends ActionBarActivity {
             public void onClick(View v) {
                 String provider = Settings.Secure.getString(getContentResolver(), Settings.Secure.LOCATION_PROVIDERS_ALLOWED);
 
-                if(!provider.contains("gps")){ //if gps is disabled
+                if (!provider.contains("gps")) { //if gps is disabled
+                    final Intent poke = new Intent();
+                    poke.setClassName("com.android.settings", "com.android.settings.widget.SettingsAppWidgetProvider");
+                    poke.addCategory(Intent.CATEGORY_ALTERNATIVE);
+                    poke.setData(Uri.parse("3"));
+                    sendBroadcast(poke);
+                } else {
+
                     final Intent poke = new Intent();
                     poke.setClassName("com.android.settings", "com.android.settings.widget.SettingsAppWidgetProvider");
                     poke.addCategory(Intent.CATEGORY_ALTERNATIVE);
                     poke.setData(Uri.parse("3"));
                     sendBroadcast(poke);
                 }
-                else {
-
-                        final Intent poke = new Intent();
-                        poke.setClassName("com.android.settings", "com.android.settings.widget.SettingsAppWidgetProvider");
-                        poke.addCategory(Intent.CATEGORY_ALTERNATIVE);
-                        poke.setData(Uri.parse("3"));
-                        sendBroadcast(poke);
-                }
 
             }
         });
+
+        ibHotspot=(ImageButton)findViewById(R.id.ibHotspot);
+        ibHotspot.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                configApState(MainActivity.this);
+
+
+            }
+
+
+
+
+
+        });
+
 
 
 
@@ -183,10 +203,9 @@ public class MainActivity extends ActionBarActivity {
         else{
             wiFiManager.setWifiEnabled(false);//關閉Wifi
         }
-
-
-
     }
+
+
     private void onLock(){
         boolean active=manger.isAdminActive(componentName);
         if(active){
@@ -201,8 +220,39 @@ public class MainActivity extends ActionBarActivity {
 
         }
 
-
         }
+
+    public static boolean isApOn(Context context) {
+        WifiManager wifimanager = (WifiManager) context.getSystemService(context.WIFI_SERVICE);
+        try {
+            Method method = wifimanager.getClass().getDeclaredMethod("isWifiApEnabled");
+            method.setAccessible(true);
+            return (Boolean) method.invoke(wifimanager);
+        }
+        catch (Throwable ignored) {}
+        return false;
+    }
+
+    // toggle wifi hotspot on or off
+    public static boolean configApState(Context context) {
+        WifiManager wifimanager = (WifiManager) context.getSystemService(context.WIFI_SERVICE);
+        WifiConfiguration wificonfiguration = null;
+        try {
+            // if WiFi is on, turn it off
+            if(isApOn(context)) {
+                wifimanager.setWifiEnabled(false);
+            }
+            Method method = wifimanager.getClass().getMethod("setWifiApEnabled", WifiConfiguration.class, boolean.class);
+            method.invoke(wifimanager, wificonfiguration, !isApOn(context));
+            return true;
+        }
+        catch (Exception e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+
+
 
 
 
