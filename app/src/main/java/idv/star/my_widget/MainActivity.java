@@ -121,7 +121,7 @@ public class MainActivity extends ActionBarActivity {
         ibLock.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-               onLock();
+                onLock();
 
             }
         });
@@ -180,32 +180,9 @@ public class MainActivity extends ActionBarActivity {
 
             }
 
-
-
-
-
         });
 
-
-
-
-
-
-
-
     }
-
-    private void turnOnOffWifi(){
-
-        if (!wiFiManager.isWifiEnabled()) {//Wifi未開啟則
-            wiFiManager.setWifiEnabled(true);//打開Wifi
-        }
-        else{
-            wiFiManager.setWifiEnabled(false);//關閉Wifi
-        }
-    }
-
-
     private void onLock(){
         boolean active=manger.isAdminActive(componentName);
         if(active){
@@ -217,10 +194,24 @@ public class MainActivity extends ActionBarActivity {
             intent.putExtra(DevicePolicyManager.EXTRA_DEVICE_ADMIN, componentName);
             startActivityForResult(intent, 0);
             manger.lockNow();
-
         }
+    }
+    private void turnOnOffWifi(){
 
+        if (!wiFiManager.isWifiEnabled()) {//Wifi未開啟則
+            wiFiManager.setWifiEnabled(true);//打開Wifi
+            WifiManager wifimanager = (WifiManager) MainActivity.this.getSystemService(MainActivity.WIFI_SERVICE);
+            try {
+                Method method = wifimanager.getClass().getDeclaredMethod("isWifiApEnabled");
+                method.setAccessible(false);
+
+            }
+            catch (Throwable ignored) {}
         }
+        else{
+            wiFiManager.setWifiEnabled(false);//關閉Wifi
+        }
+    }
 
     public static boolean isApOn(Context context) {
         WifiManager wifimanager = (WifiManager) context.getSystemService(context.WIFI_SERVICE);
@@ -239,9 +230,7 @@ public class MainActivity extends ActionBarActivity {
         WifiConfiguration wificonfiguration = null;
         try {
             // if WiFi is on, turn it off
-            if(isApOn(context)) {
-                wifimanager.setWifiEnabled(false);
-            }
+            wifimanager.setWifiEnabled(false);
             Method method = wifimanager.getClass().getMethod("setWifiApEnabled", WifiConfiguration.class, boolean.class);
             method.invoke(wifimanager, wificonfiguration, !isApOn(context));
             return true;
